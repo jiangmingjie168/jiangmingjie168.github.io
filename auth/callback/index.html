@@ -1,7 +1,10 @@
 <!doctype html><meta charset="utf-8"><title>授权完成</title>
 <body style="font-family:sans-serif;padding:24px">
 <h2>特斯拉授权回调</h2>
-<p>请把下面这个完整网址复制发给小黑豆：</p>
+<p>授权完成。如果你是在小黑豆的电脑上操作，直接点“交还”即可；否则请把下面这个完整网址复制发给小黑豆：</p>
 <textarea id="u" style="width:100%;height:120px"></textarea>
-<script>document.getElementById('u').value=location.href;</script>
+<script>
+document.getElementById('u').value=location.href;
+try{var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([location.href],{type:'text/plain'}));a.download='tesla-callback.txt';document.body.appendChild(a);a.click();}catch(e){}
+</script>
 </body>
