@@ -1,0 +1,1510 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#f3c98a">
+<meta name="format-detection" content="telephone=no">
+<title>Daily English Adventure — Yangyang's English Adventure</title>
+<style>
+  :root {
+    --safe-t: env(safe-area-inset-top, 0px);
+    --safe-b: env(safe-area-inset-bottom, 0px);
+    --safe-l: env(safe-area-inset-left, 0px);
+    --safe-r: env(safe-area-inset-right, 0px);
+    --ink: #2b2118;
+    --muted: #7a6556;
+    --paper: #fff8ef;
+    --paper-edge: #f3e4d0;
+    --accent: #e07a3d;
+    --accent-deep: #c45c28;
+    --ok: #2c9b6a;
+    --ok-soft: #e6f6ee;
+    --bad: #d15b48;
+    --bad-soft: #fdecea;
+    --star: #f0b429;
+    --streak: #e56b2e;
+    --line: #e8d5be;
+    --shadow: 0 12px 32px rgba(80, 48, 20, .14);
+    --radius: 24px;
+    --font: ui-rounded, "SF Pro Rounded", -apple-system, "PingFang SC", "Hiragino Sans GB", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; padding: 0; height: 100%; }
+  body {
+    font-family: var(--font);
+    color: var(--ink);
+    background: #f3c98a;
+    min-height: 100dvh;
+    overflow: hidden;
+    user-select: none;
+  }
+  button { font-family: inherit; }
+
+  .sky {
+    position: fixed; inset: 0;
+    background:
+      radial-gradient(1200px 600px at 20% -10%, #ffe7b3 0%, transparent 55%),
+      radial-gradient(900px 500px at 110% 10%, #f7b36a 0%, transparent 50%),
+      linear-gradient(180deg, #f7d7a1 0%, #f0c07a 42%, #e8d5b0 100%);
+    z-index: 0;
+    transition: background 700ms ease;
+  }
+  body.theme-play .sky { opacity: 1; }
+  body.theme-door .sky { background: linear-gradient(180deg, #9fd4f5 0%, #c8e7fb 38%, #efe3c0 100%); }
+  body.theme-walk .sky { background: linear-gradient(180deg, #8ecdf0 0%, #c6ebc2 48%, #d9efb0 100%); }
+  body.theme-sky .sky { background: linear-gradient(180deg, #6eb6ea 0%, #b9dcfa 40%, #f0d56a 100%); }
+  body.theme-pets .sky { background: linear-gradient(180deg, #f0d2a8 0%, #f6e6cc 50%, #e8d0aa 100%); }
+  body.theme-farm .sky { background: linear-gradient(180deg, #b7d36a 0%, #dce89a 40%, #efe3a8 100%); }
+  body.theme-water .sky { background: linear-gradient(180deg, #7ec9de 0%, #b9e4ea 42%, #f0e0b4 100%); }
+  body.theme-yard .sky { background: linear-gradient(180deg, #c5dca8 0%, #e4edd0 50%, #efe6d2 100%); }
+  body.theme-garden .sky { background: linear-gradient(180deg, #c8d85a 0%, #e8d56a 55%, #c4a056 100%); }
+  body.theme-make .sky { background: linear-gradient(180deg, #e8d2ae 0%, #f3e6d0 50%, #d4b48a 100%); }
+  body.theme-moon .sky { background: linear-gradient(180deg, #12162f 0%, #2a2f5c 48%, #3a2f58 100%); }
+  body.theme-bed .sky { background: linear-gradient(180deg, #1a1436 0%, #3a2a58 55%, #2a2048 100%); }
+  body.theme-finale .sky { background: linear-gradient(180deg, #ffd76a 0%, #ffb45a 45%, #ffe9b4 100%); }
+  body.theme-morning .sky { background: linear-gradient(180deg, #ffd9a0 0%, #f7c07a 40%, #f6e1c0 100%); }
+
+  .wrap { position: relative; z-index: 1; height: 100dvh; display: flex; flex-direction: column; }
+
+  /* ===== MAP ===== */
+  #view-map {
+    flex: 1;
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: calc(var(--safe-t) + 18px) calc(20px + var(--safe-r)) calc(28px + var(--safe-b)) calc(20px + var(--safe-l));
+  }
+  .brand { text-align: center; margin: 6px 0 18px; }
+  .brand-en {
+    font-size: 1.55rem; font-weight: 800; letter-spacing: -0.03em;
+    line-height: 1.15; color: #2b2118;
+    text-shadow: 0 1px 0 rgba(255,255,255,.45);
+  }
+  .brand-zh { margin-top: 4px; font-size: 1.05rem; color: #6a4e38; font-weight: 600; }
+  .brand-tip { margin-top: 8px; font-size: .82rem; color: #8a6e5a; line-height: 1.45; }
+  .hero {
+    height: 132px; margin: 0 auto 18px; max-width: 420px;
+    filter: drop-shadow(0 10px 16px rgba(90,50,20,.12));
+  }
+  .hero svg { width: 100%; height: 100%; display: block; }
+
+  .start-btn, .sheet-btn, .listen-btn, .choice, .icon-btn {
+    border: 0; cursor: pointer; appearance: none;
+  }
+  .start-btn {
+    display: block; width: 100%; max-width: 420px; margin: 0 auto 22px;
+    background: linear-gradient(180deg, #f08a42, #de6a28);
+    color: #fff; font-size: 1.15rem; font-weight: 700;
+    padding: 16px 20px; border-radius: 999px;
+    box-shadow: 0 8px 0 #b84e16, 0 14px 24px rgba(180,70,20,.25);
+    min-height: 56px;
+  }
+  .start-btn:active { transform: translateY(2px); box-shadow: 0 6px 0 #b84e16, 0 8px 16px rgba(180,70,20,.2); }
+
+  .journey { max-width: 420px; margin: 0 auto; }
+  .chapter {
+    margin: 0 0 8px 4px;
+    font-size: .75rem; font-weight: 700; letter-spacing: .14em;
+    color: #8a6748; text-transform: none;
+  }
+  .chapter:not(:first-child) { margin-top: 18px; }
+  .path { position: relative; padding-left: 8px; }
+  .path::before {
+    content: ""; position: absolute; left: 35px; top: 18px; bottom: 18px;
+    width: 3px; border-radius: 3px;
+    background: linear-gradient(180deg, #e8c48a, #d4b07a);
+  }
+  .node {
+    position: relative; display: flex; align-items: center; gap: 12px;
+    width: 100%; text-align: left;
+    background: var(--paper);
+    border: 1px solid rgba(255,255,255,.7);
+    border-radius: 18px;
+    padding: 10px 14px 10px 10px;
+    margin: 0 0 10px;
+    box-shadow: 0 6px 16px rgba(90,50,20,.08);
+    color: inherit;
+    min-height: 72px;
+    transition: transform .15s ease, box-shadow .15s ease;
+  }
+  .node:active { transform: scale(.985); }
+  .node.done { box-shadow: 0 6px 16px rgba(44,155,106,.12); }
+  .node.done .node-badge { outline: 2px solid #3cb37a; }
+  .node-icon {
+    width: 52px; height: 52px; flex: 0 0 52px;
+    border-radius: 16px; overflow: hidden;
+    box-shadow: inset 0 0 0 1px rgba(0,0,0,.05);
+  }
+  .node-icon svg { width: 100%; height: 100%; display: block; }
+  .node-text { flex: 1; min-width: 0; }
+  .node-name { font-size: 1.05rem; font-weight: 750; line-height: 1.2; }
+  .node-en { font-size: .75rem; color: var(--muted); margin-top: 2px; }
+  .node-badge {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: #f3e6d4; color: #a18468;
+    display: grid; place-items: center;
+    font-size: .7rem; font-weight: 800;
+    flex: 0 0 28px;
+  }
+  .node.done .node-badge { background: #fff4c8; color: #c48a10; }
+  .node-badge .tick { color: #2c9b6a; font-size: .9rem; }
+
+  /* ===== PLAY ===== */
+  #view-play {
+    display: none;
+    flex: 1; flex-direction: column;
+    min-height: 0;
+    padding-top: var(--safe-t);
+  }
+  .play-bar {
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 12px 6px calc(12px + var(--safe-l));
+    padding-right: calc(12px + var(--safe-r));
+  }
+  .icon-btn {
+    width: 42px; height: 42px; border-radius: 14px;
+    background: rgba(255,255,255,.72);
+    backdrop-filter: blur(8px);
+    color: var(--ink); font-size: 1.1rem; font-weight: 700;
+    box-shadow: 0 2px 8px rgba(40,20,10,.08);
+    display: grid; place-items: center;
+    flex: 0 0 42px;
+  }
+  .play-title { flex: 1; min-width: 0; text-align: center; }
+  .play-title .cn { font-weight: 800; font-size: 1rem; line-height: 1.2; }
+  .play-title .en { font-size: .7rem; color: var(--muted); margin-top: 1px; }
+  body.theme-moon .play-title .cn,
+  body.theme-bed .play-title .cn { color: #f6efe4; }
+  body.theme-moon .play-title .en,
+  body.theme-bed .play-title .en { color: #c8bdd8; }
+  body.theme-moon .icon-btn,
+  body.theme-bed .icon-btn { background: rgba(255,255,255,.16); color: #f6efe4; }
+  .stats {
+    display: flex; gap: 6px; align-items: center;
+    font-weight: 800; font-size: .82rem;
+  }
+  .pill {
+    background: rgba(255,255,255,.78);
+    padding: 5px 8px; border-radius: 999px;
+    box-shadow: 0 2px 8px rgba(40,20,10,.08);
+    white-space: nowrap;
+  }
+  body.theme-moon .pill, body.theme-bed .pill { background: rgba(255,255,255,.16); color: #f6efe4; }
+  .pill .s { color: #d9480f; }
+  .dots {
+    display: flex; justify-content: center; gap: 5px;
+    padding: 0 16px 6px;
+  }
+  .dot { width: 7px; height: 7px; border-radius: 50%; background: rgba(0,0,0,.18); }
+  .dot.on { background: #fff; box-shadow: 0 0 0 3px rgba(224,122,61,.35); }
+  .dot.done { background: #2c9b6a; }
+  body.theme-moon .dot, body.theme-bed .dot { background: rgba(255,255,255,.28); }
+  body.theme-moon .dot.on, body.theme-bed .dot.on { background: #f0d78c; }
+
+  .stage {
+    height: min(210px, 32vh);
+    padding: 0 8px;
+    display: flex; align-items: flex-end; justify-content: center;
+    position: relative;
+    z-index: 0;
+    overflow: hidden;
+    flex: 0 0 auto;
+  }
+  .stage-art {
+    width: 100%; max-width: 460px; height: 100%;
+    filter: drop-shadow(0 8px 14px rgba(20,20,40,.12));
+  }
+  .stage-art svg { width: 100%; height: 100%; display: block; overflow: hidden; }
+
+  .sheet {
+    flex: 1; min-height: 0;
+    position: relative;
+    z-index: 2;
+    background: var(--paper);
+    border-radius: 28px 28px 0 0;
+    box-shadow: 0 -12px 40px rgba(40,20,10,.12);
+    padding: 18px 18px calc(16px + var(--safe-b));
+    padding-left: calc(18px + var(--safe-l));
+    padding-right: calc(18px + var(--safe-r));
+    display: flex; flex-direction: column;
+    overflow: auto;
+  }
+  .prompt { text-align: center; color: var(--muted); font-size: .88rem; margin: 0 0 10px; }
+  .listen-row { display: flex; flex-direction: column; align-items: center; gap: 8px; margin-bottom: 8px; }
+  .listen-btn {
+    width: 86px; height: 86px; border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #ffb070, #e07a3d 58%, #c45c28);
+    color: #fff;
+    box-shadow: 0 8px 0 #b84e16, 0 14px 24px rgba(180,70,20,.28);
+    display: grid; place-items: center;
+    position: relative;
+  }
+  .listen-btn svg { width: 38px; height: 38px; display: block; }
+  .listen-btn:active { transform: translateY(2px); box-shadow: 0 6px 0 #b84e16, 0 8px 16px rgba(180,70,20,.2); }
+  .listen-btn.speaking::after {
+    content: ""; position: absolute; inset: -8px; border-radius: 50%;
+    border: 3px solid rgba(224,122,61,.45);
+    animation: pulse 1.1s ease-out infinite;
+  }
+  @keyframes pulse {
+    0% { transform: scale(.85); opacity: .9; }
+    100% { transform: scale(1.2); opacity: 0; }
+  }
+  .listen-label { font-size: .78rem; font-weight: 700; color: var(--accent-deep); }
+  .phrase {
+    min-height: 2.2em; text-align: center;
+    font-size: 1.15rem; font-weight: 800;
+    color: var(--ink); letter-spacing: -0.02em;
+    margin: 2px 0 10px; line-height: 1.3;
+    transition: opacity .35s ease;
+  }
+  .phrase.hidden-phrase { color: #cbb7a3; font-weight: 600; letter-spacing: .2em; }
+  .choices { display: flex; flex-direction: column; gap: 10px; }
+  .choice {
+    width: 100%; min-height: 58px;
+    background: #fff; color: var(--ink);
+    border-radius: 18px;
+    padding: 14px 16px;
+    font-size: 1.15rem; font-weight: 700;
+    box-shadow: 0 2px 0 #ead9c4, 0 8px 16px rgba(90,50,20,.06);
+    border: 2px solid #f0e4d4;
+    text-align: center; line-height: 1.35;
+  }
+  .choice:active { transform: scale(.985); }
+  .choice.correct { background: var(--ok-soft); border-color: #2c9b6a; color: #1e704c; }
+  .choice.wrong { background: var(--bad-soft); border-color: #d15b48; color: #9a3b2e; animation: shake .4s ease; }
+  .choice:disabled { opacity: 1; }
+  .choice.wrong:disabled { opacity: .55; }
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-6px); }
+    75% { transform: translateX(6px); }
+  }
+  .feedback {
+    min-height: 1.6em; text-align: center;
+    font-weight: 750; font-size: .98rem;
+    margin-top: 10px;
+  }
+  .feedback.ok { color: #1e704c; }
+  .feedback.bad { color: #9a3b2e; }
+
+  /* ===== OVERLAYS ===== */
+  .overlay {
+    display: none; position: fixed; inset: 0; z-index: 20;
+    background: rgba(40, 24, 12, .38);
+    backdrop-filter: blur(6px);
+    padding: calc(24px + var(--safe-t)) 22px calc(24px + var(--safe-b));
+    align-items: center; justify-content: center;
+  }
+  .overlay.show { display: flex; }
+  .modal {
+    width: 100%; max-width: 360px;
+    background: var(--paper);
+    border-radius: 28px;
+    padding: 26px 22px 22px;
+    text-align: center;
+    box-shadow: var(--shadow);
+    animation: pop .4s ease;
+  }
+  @keyframes pop {
+    from { transform: scale(.92) translateY(12px); opacity: 0; }
+    to { transform: scale(1) translateY(0); opacity: 1; }
+  }
+  .modal h2 { margin: 8px 0 6px; font-size: 1.45rem; }
+  .modal p { margin: 0 0 16px; color: var(--muted); line-height: 1.5; font-size: .95rem; }
+  .modal .big-star { font-size: 3rem; line-height: 1; }
+  .sheet-btn {
+    width: 100%; min-height: 52px; border-radius: 999px;
+    font-size: 1.05rem; font-weight: 750; margin-top: 8px;
+    background: linear-gradient(180deg, #f08a42, #de6a28);
+    color: #fff;
+    box-shadow: 0 6px 0 #b84e16;
+  }
+  .sheet-btn.ghost {
+    background: #fff; color: var(--ink);
+    box-shadow: 0 2px 0 #ead9c4;
+    border: 2px solid #f0e4d4;
+  }
+  .sheet-btn:active { transform: translateY(1px); }
+
+  @media (max-height: 700px) {
+    .stage { height: min(168px, 28vh); }
+    .hero { height: 108px; }
+    .listen-btn { width: 72px; height: 72px; font-size: 1.7rem; }
+    .choice { min-height: 52px; padding: 11px 14px; font-size: 1.08rem; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+  }
+</style>
+</head>
+<body>
+<div class="sky" aria-hidden="true"></div>
+<div class="wrap">
+  <section id="view-map">
+    <header class="brand">
+      <div class="brand-en">Daily English Adventure</div>
+      <div class="brand-zh">杨杨的英语冒险</div>
+      <div class="brand-tip">听一句英语，选出对的中文意思<br>顺着一天的路程，一站一站走下去</div>
+    </header>
+    <div class="hero" id="hero-art"></div>
+    <button class="start-btn" id="btn-start" type="button">开始今天的冒险</button>
+    <div class="journey" id="journey"></div>
+  </section>
+
+  <section id="view-play">
+    <div class="play-bar">
+      <button class="icon-btn" id="btn-back" type="button" aria-label="回到地图">←</button>
+      <div class="play-title">
+        <div class="cn" id="play-cn"></div>
+        <div class="en" id="play-en"></div>
+      </div>
+      <div class="stats">
+        <div class="pill" id="stat-stars" title="星星">⭐ 0</div>
+        <div class="pill" id="stat-streak" title="连击">🔥 0</div>
+      </div>
+    </div>
+    <div class="dots" id="dots"></div>
+    <div class="stage"><div class="stage-art" id="stage-art"></div></div>
+    <div class="sheet">
+      <div class="prompt">听一听，选出正确的意思</div>
+      <div class="listen-row">
+        <button class="listen-btn" id="btn-listen" type="button" aria-label="听一听"><svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#fff" d="M7 17h9l13-9v32L16 31H7z"/><path fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" d="M33 17.5c3.4 3.2 3.4 9.8 0 13"/><path fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" d="M38.5 12.5c6.2 6 6.2 17 0 23"/></svg></button>
+        <div class="listen-label">听一听</div>
+      </div>
+      <div class="phrase hidden-phrase" id="phrase">•••</div>
+      <div class="choices" id="choices"></div>
+      <div class="feedback" id="feedback"></div>
+    </div>
+  </section>
+</div>
+
+<div class="overlay" id="overlay-clear">
+  <div class="modal">
+    <div class="big-star">🌟</div>
+    <h2 id="clear-title">这一站完成了</h2>
+    <p id="clear-msg"></p>
+    <button class="sheet-btn" id="btn-next" type="button">下一站</button>
+    <button class="sheet-btn ghost" id="btn-to-map" type="button">回到地图</button>
+  </div>
+</div>
+<div class="overlay" id="overlay-done">
+  <div class="modal">
+    <div class="big-star">🎉</div>
+    <h2>今天的冒险完成了</h2>
+    <p id="done-msg"></p>
+    <button class="sheet-btn" id="btn-again" type="button">再玩一天</button>
+    <button class="sheet-btn ghost" id="btn-done-map" type="button">回到地图</button>
+  </div>
+</div>
+
+<script>
+const SCENES = [
+  {
+    id: "morning",
+    theme: "morning",
+    name: "清晨家里",
+    nameEn: "Morning at Home",
+    items: [
+      { phrase: "Good morning.", translation: "早上好。", word: "Good morning." },
+      { phrase: "Good morning, how are you?", translation: "早上好，你好吗？", word: "Good morning, how are you?" },
+      { phrase: "Hello!", translation: "你好！", word: "Hello!" },
+      { phrase: "This is my room.", translation: "这是我的房间。", word: "room" },
+      { phrase: "Look at the window.", translation: "看那扇窗户。", word: "window" },
+      { phrase: "Look at the wall.", translation: "看这面墙。", word: "wall" },
+      { phrase: "This is the table.", translation: "这是桌子。", word: "table" },
+      { phrase: "Time for bread.", translation: "该吃面包啦。", word: "bread" },
+      { phrase: "Please.", translation: "请。", word: "Please." },
+      { phrase: "Thank you.", translation: "谢谢。", word: "Thank you." }
+    ]
+  },
+  {
+    id: "door",
+    theme: "door",
+    name: "出门啦",
+    nameEn: "Out the Door",
+    items: [
+      { phrase: "This is my house.", translation: "这是我的房子。", word: "house" },
+      { phrase: "Look at the roof.", translation: "看屋顶。", word: "roof" },
+      { phrase: "Look at the door.", translation: "看那扇门。", word: "door" },
+      { phrase: "See you!", translation: "再见！", word: "See you!" },
+      { phrase: "Let's go!", translation: "我们走吧！", word: "Let's go!" }
+    ]
+  },
+  {
+    id: "walk",
+    theme: "walk",
+    name: "出去走走",
+    nameEn: "A Walk Outside",
+    items: [
+      { phrase: "Let's go for a walk!", translation: "我们去散步吧！", word: "Let's go for a walk!" },
+      { phrase: "Look at the tree.", translation: "看那棵树。", word: "tree" },
+      { phrase: "Look at the flower.", translation: "看那朵花。", word: "flower" },
+      { phrase: "Look at the grass.", translation: "看这些草。", word: "grass" },
+      { phrase: "Look at the leaves.", translation: "看这些叶子。", word: "leaves" },
+      { phrase: "This is a stick.", translation: "这是一根树枝。", word: "stick" },
+      { phrase: "I can jump!", translation: "我可以跳！", word: "jump" }
+    ]
+  },
+  {
+    id: "sky",
+    theme: "sky",
+    name: "看看天空",
+    nameEn: "Look at the Sky",
+    items: [
+      { phrase: "Look at the sun.", translation: "看太阳。", word: "sun" },
+      { phrase: "Look at the cloud.", translation: "看那朵云。", word: "cloud" },
+      { phrase: "Look at the rain.", translation: "看，下雨了。", word: "rain" }
+    ]
+  },
+  {
+    id: "pets",
+    theme: "pets",
+    name: "我的宠物",
+    nameEn: "My Pets",
+    items: [
+      { phrase: "This is my dog.", translation: "这是我的狗。", word: "dog" },
+      { phrase: "This is my cat.", translation: "这是我的猫。", word: "cat" },
+      { phrase: "This is my pet.", translation: "这是我的宠物。", word: "pet" },
+      { phrase: "Your pet follows you.", translation: "你的宠物跟着你走。", word: "follow" }
+    ]
+  },
+  {
+    id: "farm",
+    theme: "farm",
+    name: "农场里",
+    nameEn: "On the Farm",
+    items: [
+      { phrase: "Look at the pig.", translation: "看那只猪。", word: "pig" },
+      { phrase: "Look at the cow.", translation: "看那头奶牛。", word: "cow" },
+      { phrase: "Look at the sheep.", translation: "看那只绵羊。", word: "sheep" },
+      { phrase: "The sheep has wool.", translation: "绵羊有羊毛。", word: "wool" },
+      { phrase: "Look at the horse.", translation: "看那匹马。", word: "horse" },
+      { phrase: "Look at the chicken.", translation: "看那只鸡。", word: "chicken" },
+      { phrase: "Look at the rabbit.", translation: "看那只兔子。", word: "rabbit" }
+    ]
+  },
+  {
+    id: "water",
+    theme: "water",
+    name: "水边",
+    nameEn: "By the Water",
+    items: [
+      { phrase: "Look at the water.", translation: "看这些水。", word: "water" },
+      { phrase: "Look at the sand.", translation: "看这些沙子。", word: "sand" },
+      { phrase: "Look at the duck.", translation: "看那只鸭子。", word: "duck" },
+      { phrase: "Look at the fish.", translation: "看那条鱼。", word: "fish" },
+      { phrase: "This is my rod.", translation: "这是我的钓鱼竿。", word: "rod" },
+      { phrase: "Look at the boat.", translation: "看那条小船。", word: "boat" }
+    ]
+  },
+  {
+    id: "yard",
+    theme: "yard",
+    name: "院子里",
+    nameEn: "In the Yard",
+    items: [
+      { phrase: "Look at the fence.", translation: "看这道围栏。", word: "fence" },
+      { phrase: "Look at the gate.", translation: "看这扇大门。", word: "gate" },
+      { phrase: "Look at the car.", translation: "看那辆汽车。", word: "car" },
+      { phrase: "Look at the wheel.", translation: "看这个轮子。", word: "wheel" }
+    ]
+  },
+  {
+    id: "garden",
+    theme: "garden",
+    name: "园子里",
+    nameEn: "In the Garden",
+    items: [
+      { phrase: "Look at the dirt.", translation: "看这些土。", word: "dirt" },
+      { phrase: "This is a stone.", translation: "这是一块石头。", word: "stone" },
+      { phrase: "This is a seed.", translation: "这是一粒种子。", word: "seed" },
+      { phrase: "Look at the wheat.", translation: "看这些小麦。", word: "wheat" }
+    ]
+  },
+  {
+    id: "make",
+    theme: "make",
+    name: "动手做",
+    nameEn: "Making Things",
+    items: [
+      { phrase: "This is wood.", translation: "这是木头。", word: "wood" },
+      { phrase: "Look at the planks.", translation: "看这些木板。", word: "planks" },
+      { phrase: "This is a rope.", translation: "这是一根绳子。", word: "rope" }
+    ]
+  },
+  {
+    id: "moon",
+    theme: "moon",
+    name: "月光下",
+    nameEn: "Under the Moon",
+    items: [
+      { phrase: "Let's go home.", translation: "我们回家吧。", word: "home" },
+      { phrase: "This is a torch.", translation: "这是一个火把。", word: "torch" },
+      { phrase: "Look at the bright moon.", translation: "看那轮明亮的月亮。", word: "Look at the bright moon." },
+      { phrase: "Look at the moon.", translation: "看月亮。", word: "moon" },
+      { phrase: "Look at the star.", translation: "看那颗星星。", word: "star" },
+      { phrase: "Wow!", translation: "哇！", word: "Wow!" }
+    ]
+  },
+  {
+    id: "bed",
+    theme: "bed",
+    name: "睡觉啦",
+    nameEn: "Bedtime",
+    items: [
+      { phrase: "This is my bed.", translation: "这是我的床。", word: "bed" },
+      { phrase: "Good night.", translation: "晚安。", word: "Good night." },
+      { phrase: "I love you.", translation: "我爱你。", word: "I love you." },
+      { phrase: "Time to go to bed, goodnight.", translation: "该睡觉啦，晚安。", word: "Time to go to bed, goodnight." }
+    ]
+  },
+  {
+    id: "finale",
+    theme: "finale",
+    name: "真棒",
+    nameEn: "You Did Great",
+    items: [
+      { phrase: "I'm happy.", translation: "我很开心。", word: "I'm happy." },
+      { phrase: "High five, great job!", translation: "击掌，干得好！", word: "High five, great job!" }
+    ]
+  }
+];
+
+const CHAPTERS = [
+  { title: "早晨", ids: ["morning", "door"] },
+  { title: "白天", ids: ["walk", "sky", "pets", "farm", "water", "yard", "garden", "make"] },
+  { title: "夜里", ids: ["moon", "bed"] },
+  { title: "结束", ids: ["finale"] }
+];
+
+const cssAnim = `
+<style>
+  .s-sway { transform-origin: 50% 100%; animation: sway 3.6s ease-in-out infinite; }
+  .s-sway2 { transform-origin: 50% 100%; animation: sway 4.4s ease-in-out .4s infinite; }
+  .s-drift { animation: drift 14s ease-in-out infinite alternate; }
+  .s-drift2 { animation: drift 18s ease-in-out .8s infinite alternate; }
+  .s-bob { animation: bob 2.4s ease-in-out infinite; }
+  .s-bob2 { animation: bob 3s ease-in-out .5s infinite; }
+  .s-pulse { animation: glow 2.2s ease-in-out infinite; }
+  .s-twinkle { animation: twinkle 1.8s ease-in-out infinite; }
+  .s-twinkle2 { animation: twinkle 2.4s ease-in-out .6s infinite; }
+  .s-fall { animation: fall 1.5s linear infinite; }
+  .s-fall2 { animation: fall 1.9s linear .4s infinite; }
+  .s-fall3 { animation: fall 1.7s linear .9s infinite; }
+  .s-rays { transform-origin: 50% 50%; animation: spin 28s linear infinite; }
+  .s-hop { animation: hop 1.6s ease-in-out infinite; }
+  .s-flicker { animation: flicker 1.1s ease-in-out infinite; }
+  .s-swim { animation: swim 5s ease-in-out infinite; }
+  .s-steam { animation: steam 2.8s ease-out infinite; }
+  @keyframes sway { 0%,100% { transform: rotate(-4deg); } 50% { transform: rotate(5deg); } }
+  @keyframes drift { from { transform: translateX(-12px); } to { transform: translateX(16px); } }
+  @keyframes bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+  @keyframes glow { 0%,100% { opacity: .7; } 50% { opacity: 1; } }
+  @keyframes twinkle { 0%,100% { opacity: .35; } 50% { opacity: 1; } }
+  @keyframes fall { 0% { transform: translateY(-8px); opacity: .2; } 20% { opacity: .8; } 100% { transform: translateY(86px); opacity: 0; } }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @keyframes hop { 0%,100% { transform: translateY(0); } 40% { transform: translateY(-10px); } }
+  @keyframes flicker { 0%,100% { opacity: .85; } 40% { opacity: 1; } 70% { opacity: .7; } }
+  @keyframes swim { 0%,100% { transform: translate(0,0); } 50% { transform: translate(18px,-6px); } }
+  @keyframes steam { 0% { transform: translateY(0); opacity: .5; } 100% { transform: translateY(-16px); opacity: 0; } }
+</style>`;
+
+function svg(inner, vb="0 0 360 200") {
+  return `${cssAnim}<svg viewBox="${vb}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">${inner}</svg>`;
+}
+
+const ART = {
+  morning() {
+    return svg(`
+      <defs>
+        <linearGradient id="m-sky" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#ffd19a"/><stop offset="1" stop-color="#ffc07a"/>
+        </linearGradient>
+        <radialGradient id="m-sun" cx="50%" cy="50%" r="50%">
+          <stop offset="0" stop-color="#fff4c8"/><stop offset="1" stop-color="#ffb03a"/>
+        </radialGradient>
+        <clipPath id="m-win"><rect x="118" y="28" width="124" height="88" rx="8"/></clipPath>
+      </defs>
+      <rect x="78" y="10" width="204" height="178" rx="16" fill="#f6e1c6"/>
+      <rect x="78" y="10" width="204" height="178" rx="16" fill="none" stroke="#e2c49a" stroke-width="3"/>
+      <rect x="118" y="28" width="124" height="88" rx="8" fill="url(#m-sky)"/>
+      <g clip-path="url(#m-win)">
+        <circle class="s-pulse" cx="212" cy="52" r="18" fill="url(#m-sun)"/>
+        <g class="s-drift" fill="#fff" opacity=".9">
+          <ellipse cx="150" cy="58" rx="18" ry="9"/>
+          <ellipse cx="164" cy="58" rx="12" ry="7"/>
+        </g>
+      </g>
+      <rect x="118" y="70" width="124" height="6" fill="#d7b48a"/>
+      <rect x="177" y="28" width="6" height="88" fill="#d7b48a"/>
+      <rect x="114" y="24" width="132" height="96" rx="10" fill="none" stroke="#c99562" stroke-width="5"/>
+      <rect x="86" y="28" width="22" height="150" fill="#eed6b6"/>
+      <rect x="252" y="28" width="22" height="150" fill="#eed6b6"/>
+      <rect x="96" y="128" width="168" height="12" rx="2" fill="#c99562"/>
+      <rect x="118" y="140" width="124" height="36" rx="5" fill="#b87a3a"/>
+      <rect x="128" y="148" width="34" height="5" rx="2" fill="#f3d7a8"/>
+      <ellipse cx="200" cy="158" rx="17" ry="8" fill="#f0d0a0"/>
+      <path d="M186 158c5-11 22-11 26 0" fill="#e8b86a"/>
+      <path class="s-steam" d="M194 149c0-8 6-8 6-14" stroke="#fff" stroke-width="2" fill="none" opacity=".6"/>
+      <path class="s-steam" d="M202 149c0-8 6-8 6-14" stroke="#fff" stroke-width="2" fill="none" opacity=".5" style="animation-delay:.5s"/>
+    `);
+  },
+  door() {
+    return svg(`
+      <defs>
+        <linearGradient id="d-sky" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#8ec8f0"/><stop offset="1" stop-color="#d7effc"/>
+        </linearGradient>
+        <linearGradient id="d-roof" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#d4653c"/><stop offset="1" stop-color="#b44a2c"/>
+        </linearGradient>
+      </defs>
+      <rect width="360" height="200" fill="url(#d-sky)"/>
+      <circle class="s-pulse" cx="304" cy="34" r="18" fill="#ffe082"/>
+      <g class="s-drift" fill="#fff" opacity=".92">
+        <ellipse cx="66" cy="40" rx="22" ry="11"/><ellipse cx="84" cy="40" rx="14" ry="8"/>
+      </g>
+      <ellipse cx="180" cy="196" rx="210" ry="28" fill="#9ccc66"/>
+      <rect x="228" y="74" width="16" height="36" rx="2" fill="#c45c3e"/>
+      <path d="M104 112 L180 48 L256 112 Z" fill="url(#d-roof)"/>
+      <path d="M104 112 L180 48 L256 112 Z" fill="none" stroke="#9a3d28" stroke-width="2"/>
+      <rect x="116" y="112" width="128" height="66" fill="#f6e4c4"/>
+      <rect x="116" y="112" width="128" height="66" fill="none" stroke="#e2c49a" stroke-width="2"/>
+      <rect x="128" y="122" width="30" height="28" rx="3" fill="#8ec8f0" stroke="#c99562" stroke-width="2"/>
+      <rect x="202" y="122" width="30" height="28" rx="3" fill="#8ec8f0" stroke="#c99562" stroke-width="2"/>
+      <rect x="142" y="134" width="30" height="2" fill="#c99562"/>
+      <rect x="216" y="134" width="30" height="2" fill="#c99562"/>
+      <rect x="168" y="128" width="24" height="50" rx="3" fill="#e0a03a"/>
+      <circle cx="186" cy="154" r="2.4" fill="#8a4a16"/>
+      <path d="M166 178 L194 178 L216 198 L144 198 Z" fill="#d7c08a"/>
+    `);
+  },
+  walk() {
+    return svg(`
+      <defs>
+        <linearGradient id="w-sky" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#87c8f0"/><stop offset="1" stop-color="#d4f0c8"/>
+        </linearGradient>
+      </defs>
+      <rect width="360" height="200" fill="url(#w-sky)"/>
+      <circle cx="304" cy="30" r="16" fill="#ffe082"/>
+      <g class="s-drift2" fill="#fff"><ellipse cx="58" cy="34" rx="20" ry="10"/><ellipse cx="74" cy="34" rx="12" ry="8"/></g>
+      <ellipse cx="180" cy="200" rx="230" ry="46" fill="#7fbe5c"/>
+      <ellipse cx="180" cy="188" rx="160" ry="16" fill="#cfe89a" opacity=".7"/>
+      <g class="s-sway">
+        <rect x="64" y="110" width="10" height="62" rx="3" fill="#8a5a2a"/>
+        <circle cx="69" cy="100" r="28" fill="#3d9a4a"/>
+        <circle cx="50" cy="112" r="16" fill="#4eab5a"/>
+        <circle cx="88" cy="110" r="15" fill="#2f8a40"/>
+      </g>
+      <g class="s-sway2">
+        <rect x="272" y="100" width="11" height="70" rx="3" fill="#8a5a2a"/>
+        <circle cx="278" cy="88" r="32" fill="#2f8a40"/>
+        <circle cx="256" cy="104" r="18" fill="#4eab5a"/>
+        <circle cx="300" cy="102" r="16" fill="#3d9a4a"/>
+      </g>
+      <g class="s-hop">
+        <circle cx="168" cy="148" r="7" fill="#f0c04a"/>
+        <circle cx="168" cy="148" r="3" fill="#fff3b0"/>
+        <path d="M168 155 L168 172" stroke="#5a8a3a" stroke-width="2"/>
+      </g>
+      <g class="s-hop" style="animation-delay:.3s">
+        <circle cx="196" cy="152" r="6" fill="#e07090"/>
+        <circle cx="196" cy="152" r="2.4" fill="#ffd0dc"/>
+        <path d="M196 158 L196 172" stroke="#5a8a3a" stroke-width="2"/>
+      </g>
+      <g transform="rotate(-22 226 168)">
+        <rect x="222" y="150" width="5" height="28" rx="2" fill="#8a5a2a"/>
+        <circle cx="224.5" cy="150" r="3" fill="#5a9a4a"/>
+      </g>
+    `);
+  },
+  sky() {
+    return svg(`
+      <defs>
+        <linearGradient id="sk" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#4a9ed8"/><stop offset="0.6" stop-color="#b9dcfa"/><stop offset="1" stop-color="#d7ebc8"/>
+        </linearGradient>
+        <radialGradient id="sk-sun" cx="50%" cy="50%" r="50%">
+          <stop offset="0" stop-color="#fff4c0"/><stop offset="1" stop-color="#ffb000"/>
+        </radialGradient>
+      </defs>
+      <rect width="360" height="200" fill="url(#sk)"/>
+      <g class="s-rays" opacity=".55">
+        <g transform="translate(78,52)" stroke="#ffe08a" stroke-width="3" stroke-linecap="round">
+          <line x1="0" y1="-36" x2="0" y2="-52"/><line x1="26" y1="-26" x2="38" y2="-38"/>
+          <line x1="36" y1="0" x2="52" y2="0"/><line x1="26" y1="26" x2="38" y2="38"/>
+          <line x1="0" y1="36" x2="0" y2="52"/><line x1="-26" y1="26" x2="-38" y2="38"/>
+          <line x1="-36" y1="0" x2="-52" y2="0"/><line x1="-26" y1="-26" x2="-38" y2="-38"/>
+        </g>
+      </g>
+      <circle cx="78" cy="52" r="24" fill="url(#sk-sun)"/>
+      <g class="s-drift" fill="#fff">
+        <ellipse cx="176" cy="44" rx="34" ry="15"/>
+        <ellipse cx="200" cy="44" rx="20" ry="12"/>
+        <ellipse cx="154" cy="46" rx="16" ry="10"/>
+      </g>
+      <g class="s-drift2">
+        <ellipse cx="278" cy="70" rx="36" ry="16" fill="#c5d4e6"/>
+        <ellipse cx="304" cy="72" rx="22" ry="13" fill="#d5e0ee"/>
+        <ellipse cx="254" cy="74" rx="18" ry="11" fill="#c5d4e6"/>
+      </g>
+      <g fill="#7aa7d0" stroke="#7aa7d0" stroke-width="2.4" stroke-linecap="round">
+        <line class="s-fall" x1="250" y1="90" x2="242" y2="90"/>
+        <line class="s-fall2" x1="268" y1="94" x2="260" y2="94"/>
+        <line class="s-fall3" x1="286" y1="88" x2="278" y2="88"/>
+        <line class="s-fall" x1="304" y1="96" x2="296" y2="96" style="animation-delay:.2s"/>
+        <line class="s-fall2" x1="258" y1="86" x2="250" y2="86"/>
+        <line class="s-fall3" x1="292" y1="102" x2="284" y2="102"/>
+        <line class="s-fall" x1="274" y1="100" x2="266" y2="100" style="animation-delay:.7s"/>
+        <line class="s-fall2" x1="240" y1="100" x2="232" y2="100" style="animation-delay:.3s"/>
+        <line class="s-fall3" x1="314" y1="90" x2="306" y2="90" style="animation-delay:.5s"/>
+      </g>
+      <ellipse cx="180" cy="208" rx="230" ry="22" fill="#8fbf70"/>
+    `);
+  },
+  pets() {
+    return svg(`
+      <rect width="360" height="200" fill="#f6e4cc"/>
+      <ellipse cx="180" cy="206" rx="230" ry="40" fill="#e8d0a8"/>
+      <ellipse cx="180" cy="168" rx="80" ry="16" fill="#d9b888" opacity=".45"/>
+      <g class="s-bob">
+        <!-- dog -->
+        <ellipse cx="128" cy="148" rx="26" ry="15" fill="#c48a4a"/>
+        <rect x="108" y="152" width="7" height="16" rx="3" fill="#a06a38"/>
+        <rect x="136" y="152" width="7" height="16" rx="3" fill="#a06a38"/>
+        <circle cx="154" cy="136" r="15" fill="#c48a4a"/>
+        <path d="M144 124 q-2 8 8 10" fill="#a06a38"/>
+        <ellipse cx="166" cy="140" rx="8" ry="5" fill="#e8b88a"/>
+        <circle cx="150" cy="134" r="2.2" fill="#2b2118"/>
+        <circle cx="166" cy="140" r="1.1" fill="#2b2118"/>
+        <path d="M104 144 q-16 -14 -6 -24" stroke="#c48a4a" stroke-width="6" fill="none" stroke-linecap="round"/>
+      </g>
+      <g fill="none" stroke="#b88860" stroke-width="2" stroke-dasharray="3 5" stroke-linecap="round">
+        <path d="M168 156 C190 168 200 150 214 156"/>
+      </g>
+      <g class="s-bob2">
+        <!-- cat following -->
+        <ellipse cx="236" cy="154" rx="18" ry="11" fill="#efe6d6"/>
+        <circle cx="252" cy="142" r="12" fill="#efe6d6"/>
+        <path d="M244 130 l4 10 l8-2 z" fill="#efe6d6"/>
+        <path d="M256 130 l8 10 l-6 0 z" fill="#efe6d6"/>
+        <path d="M244 128 l3 11 7-3 z" fill="#e8d4b8"/>
+        <path d="M258 128 l7 11 -7 0 z" fill="#e8d4b8"/>
+        <circle cx="249" cy="140" r="1.7" fill="#2b2118"/>
+        <circle cx="258" cy="140" r="1.1" fill="#e8a0b0"/>
+        <path d="M260 144 h8" stroke="#c9a07a" stroke-width="1" opacity=".7"/>
+        <path d="M214 154 q-10 16 8 10" stroke="#efe6d6" stroke-width="4" fill="none" stroke-linecap="round"/>
+        <path d="M214 164 q8 4 14-2" stroke="#f4c4d0" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+      </g>
+    `);
+  },
+  farm() {
+    return svg(`
+      <defs>
+        <linearGradient id="f-sky" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#9ecbee"/><stop offset="1" stop-color="#e4f0b0"/>
+        </linearGradient>
+      </defs>
+      <rect width="360" height="200" fill="url(#f-sky)"/>
+      <ellipse cx="180" cy="210" rx="250" ry="58" fill="#b7d36a"/>
+      <!-- barn -->
+      <path d="M262 86 l44 -26 l44 26 v12 h-88z" fill="#c45c3e"/>
+      <rect x="268" y="98" width="76" height="56" fill="#e8c9a0"/>
+      <path d="M294 116 l16 0 l0 38 l-16 0 z" fill="#8a4a16"/>
+      <path d="M298 128 l8 8 8-8 -8-8 z" stroke="#8a4a16" stroke-width="2" fill="none"/>
+      <!-- horse -->
+      <g>
+        <rect x="24" y="152" width="5" height="24" rx="2" fill="#8a5a2a"/>
+        <rect x="36" y="152" width="5" height="24" rx="2" fill="#7a4a22"/>
+        <rect x="52" y="152" width="5" height="24" rx="2" fill="#8a5a2a"/>
+        <rect x="62" y="152" width="5" height="24" rx="2" fill="#7a4a22"/>
+        <ellipse cx="46" cy="148" rx="24" ry="13" fill="#c48a4a"/>
+        <path d="M66 144 L80 116 L92 122 L76 150 Z" fill="#c48a4a"/>
+        <ellipse cx="96" cy="120" rx="12" ry="7" fill="#c48a4a"/>
+        <path d="M88 113 l3 -9 5 7" fill="#a06a38"/>
+        <circle cx="92" cy="118" r="1.5" fill="#2b2118"/>
+        <path d="M74 120 q-6 12 -2 26" stroke="#8a5a2a" stroke-width="4" fill="none" stroke-linecap="round"/>
+        <path d="M24 146 q-12 8 -4 22" stroke="#8a5a2a" stroke-width="4" fill="none" stroke-linecap="round"/>
+      </g>
+      <!-- sheep with wool -->
+      <g>
+        <circle cx="118" cy="150" r="13" fill="#f4f1ea"/>
+        <circle cx="108" cy="156" r="10" fill="#f7f5f0"/>
+        <circle cx="128" cy="156" r="10" fill="#f7f5f0"/>
+        <circle cx="118" cy="160" r="9" fill="#efebe3"/>
+        <circle cx="136" cy="148" r="8" fill="#4a4a4a"/>
+        <ellipse cx="142" cy="150" rx="5" ry="3.5" fill="#6a6a6a"/>
+        <circle cx="140" cy="147" r="1.2" fill="#fff"/>
+        <rect x="110" y="164" width="3" height="10" rx="1" fill="#4a4a4a"/>
+        <rect x="124" y="164" width="3" height="10" rx="1" fill="#4a4a4a"/>
+      </g>
+      <!-- cow -->
+      <g>
+        <rect x="168" y="154" width="5" height="18" rx="2" fill="#4a4a4a"/>
+        <rect x="196" y="154" width="5" height="18" rx="2" fill="#4a4a4a"/>
+        <ellipse cx="186" cy="150" rx="24" ry="13" fill="#f4f1ea"/>
+        <circle cx="176" cy="148" r="6" fill="#3a3a3a"/>
+        <circle cx="198" cy="152" r="5" fill="#3a3a3a"/>
+        <circle cx="210" cy="142" r="10" fill="#f4f1ea"/>
+        <ellipse cx="218" cy="146" rx="7" ry="4.5" fill="#f0c0c8"/>
+        <circle cx="208" cy="140" r="1.6" fill="#2b2118"/>
+      </g>
+      <!-- pig -->
+      <g class="s-bob">
+        <ellipse cx="250" cy="164" rx="16" ry="10" fill="#f0a8b4"/>
+        <circle cx="264" cy="158" r="9" fill="#f0a8b4"/>
+        <ellipse cx="270" cy="160" rx="5" ry="3.5" fill="#e08090"/>
+        <circle cx="268" cy="160" r="0.8" fill="#4a2a2a"/>
+        <circle cx="272" cy="160" r="0.8" fill="#4a2a2a"/>
+        <circle cx="261" cy="156" r="1.4" fill="#2b2118"/>
+        <path d="M242 164 q-8 8 2 6" stroke="#f0a8b4" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <rect x="242" y="172" width="4" height="8" rx="1.5" fill="#e08090"/>
+        <rect x="254" y="172" width="4" height="8" rx="1.5" fill="#e08090"/>
+      </g>
+      <!-- chicken -->
+      <g>
+        <ellipse cx="88" cy="170" rx="9" ry="7" fill="#f0d060"/>
+        <circle cx="97" cy="164" r="6" fill="#f0d060"/>
+        <path d="M102 164 l7 2 -7 2 z" fill="#e07040"/>
+        <path d="M94 157 q2 -7 7 -2" fill="#e07040"/>
+        <path d="M84 176 l3 8" stroke="#e07040" stroke-width="2" stroke-linecap="round"/>
+        <path d="M90 176 l3 8" stroke="#e07040" stroke-width="2" stroke-linecap="round"/>
+      </g>
+      <!-- rabbit -->
+      <g class="s-hop">
+        <ellipse cx="320" cy="168" rx="9" ry="7" fill="#f4dcc0"/>
+        <circle cx="328" cy="161" r="6" fill="#f4dcc0"/>
+        <path d="M325 154 q2 -14 7 -2" fill="#f4dcc0"/>
+        <path d="M330 154 q4 -16 8 0" fill="#e8c8a0"/>
+        <circle cx="330" cy="160" r="1.1" fill="#2b2118"/>
+        <circle cx="312" cy="170" r="3.5" fill="#f8eee4"/>
+      </g>
+    `);
+  },
+  water() {
+    return svg(`
+      <defs>
+        <linearGradient id="wa-sky" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#7ebce0"/><stop offset="1" stop-color="#c8e8f0"/>
+        </linearGradient>
+        <linearGradient id="wa-w" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#4aa8c8"/><stop offset="1" stop-color="#2e7a9a"/>
+        </linearGradient>
+      </defs>
+      <rect width="360" height="200" fill="url(#wa-sky)"/>
+      <circle cx="60" cy="30" r="16" fill="#ffe082"/>
+      <path d="M0 112 Q90 100 180 114 T360 110 V200 H0 Z" fill="url(#wa-w)"/>
+      <g class="s-bob" opacity=".55" fill="none" stroke="#d4f4ff" stroke-width="2">
+        <path d="M20 132 Q70 124 120 134"/>
+        <path d="M160 146 Q220 138 280 148"/>
+      </g>
+      <path d="M0 150 Q80 160 180 150 T360 156 V200 H0 Z" fill="#e8d5a8"/>
+      <g class="s-bob2">
+        <path d="M80 122 q26 -18 52 0 v8 q-26 14 -52 0 z" fill="#d97a3a"/>
+        <rect x="104" y="90" width="3.2" height="32" fill="#7a4a22"/>
+        <path d="M107 90 l20 9 -20 5 z" fill="#f4e0c0"/>
+      </g>
+      <g class="s-bob">
+        <ellipse cx="228" cy="126" rx="15" ry="7" fill="#f0d060"/>
+        <path d="M242 122 q9 -12 2 -16 q-2 6 0 10" fill="#f0d060"/>
+        <path d="M214 126 q-6 0 -4 6" fill="#f0d060"/>
+        <circle cx="236" cy="124" r="1.3" fill="#2b2118"/>
+      </g>
+      <g class="s-swim">
+        <ellipse cx="158" cy="142" rx="13" ry="6" fill="#f4a04a"/>
+        <path d="M145 142 l-10 -6 v12 z" fill="#e88830"/>
+        <circle cx="164" cy="141" r="1.2" fill="#2b2118"/>
+        <path d="M160 136 q6 0 6 5" fill="none" stroke="#e88830" stroke-width="1"/>
+      </g>
+      <g>
+        <path d="M304 108 L304 164" stroke="#8a5a2a" stroke-width="3.2" stroke-linecap="round"/>
+        <path d="M304 108 Q250 110 226 128" fill="none" stroke="#4a4a4a" stroke-width="1.5"/>
+        <circle cx="226" cy="128" r="2.2" fill="#4a4a4a"/>
+        <path d="M292 164 h24" stroke="#8a5a2a" stroke-width="3.2" stroke-linecap="round"/>
+      </g>
+    `);
+  },
+  yard() {
+    return svg(`
+      <rect width="360" height="200" fill="#cfe3b0"/>
+      <ellipse cx="180" cy="206" rx="230" ry="40" fill="#b7d090"/>
+      <path d="M200 176 L360 176 L360 200 L200 200 Z" fill="#d8d0bc"/>
+      <path d="M200 176 L360 176" stroke="#c8c0a8" stroke-width="3"/>
+      <!-- fence left -->
+      <g fill="#e8d2a8" stroke="#8a5a2a" stroke-width="2">
+        <rect x="16" y="88" width="11" height="74" rx="2"/>
+        <rect x="44" y="88" width="11" height="74" rx="2"/>
+        <rect x="72" y="88" width="11" height="74" rx="2"/>
+      </g>
+      <line x1="16" y1="106" x2="100" y2="106" stroke="#8a5a2a" stroke-width="3.5"/>
+      <line x1="16" y1="132" x2="100" y2="132" stroke="#8a5a2a" stroke-width="3.5"/>
+      <!-- gate -->
+      <rect x="104" y="82" width="52" height="82" rx="4" fill="#c45c3e" stroke="#8a3a22" stroke-width="3"/>
+      <line x1="114" y1="96" x2="146" y2="96" stroke="#f0d78c" stroke-width="2"/>
+      <line x1="114" y1="116" x2="146" y2="116" stroke="#f0d78c" stroke-width="2"/>
+      <line x1="114" y1="136" x2="146" y2="136" stroke="#f0d78c" stroke-width="2"/>
+      <circle cx="146" cy="124" r="3.4" fill="#f0d78c"/>
+      <!-- fence right behind car -->
+      <g fill="#e8d2a8" stroke="#8a5a2a" stroke-width="2">
+        <rect x="170" y="96" width="10" height="58" rx="2"/>
+        <rect x="198" y="96" width="10" height="58" rx="2"/>
+        <rect x="226" y="96" width="10" height="58" rx="2"/>
+        <rect x="254" y="96" width="10" height="58" rx="2"/>
+        <rect x="282" y="96" width="10" height="58" rx="2"/>
+        <rect x="310" y="96" width="10" height="58" rx="2"/>
+      </g>
+      <line x1="170" y1="112" x2="320" y2="112" stroke="#8a5a2a" stroke-width="3"/>
+      <line x1="170" y1="134" x2="320" y2="134" stroke="#8a5a2a" stroke-width="3"/>
+      <!-- car in front, right -->
+      <g>
+        <rect x="200" y="128" width="100" height="34" rx="11" fill="#d94a3a"/>
+        <rect x="248" y="110" width="46" height="24" rx="7" fill="#c43e32"/>
+        <rect x="256" y="116" width="28" height="14" rx="3" fill="#9fd4f5"/>
+        <rect x="214" y="136" width="12" height="6" rx="2" fill="#ffd76a"/>
+        <circle cx="222" cy="164" r="13" fill="#2a2a2a"/>
+        <circle cx="222" cy="164" r="6" fill="#d0d4d8"/>
+        <circle cx="286" cy="164" r="13" fill="#2a2a2a"/>
+        <circle cx="286" cy="164" r="6" fill="#d0d4d8"/>
+      </g>
+    `);
+  },
+  garden() {
+    return svg(`
+      <defs>
+        <linearGradient id="g-sky" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#dce89a"/><stop offset="1" stop-color="#c8d85a"/>
+        </linearGradient>
+      </defs>
+      <rect width="360" height="200" fill="url(#g-sky)"/>
+      <ellipse cx="80" cy="36" rx="40" ry="14" fill="#e8f0b0" opacity=".6"/>
+      <!-- bed border -->
+      <path d="M24 118 Q180 92 336 120 L336 186 Q180 210 24 186 Z" fill="#7a4a22"/>
+      <path d="M36 124 Q180 102 324 126 L324 176 Q180 196 36 172 Z" fill="#8a5a2a"/>
+      <path d="M48 148 Q180 132 312 150" fill="none" stroke="#6e4620" stroke-width="8" stroke-linecap="round"/>
+      <!-- stones -->
+      <g fill="#c8c0b0">
+        <ellipse cx="78" cy="168" rx="18" ry="10"/>
+        <ellipse cx="104" cy="176" rx="13" ry="8"/>
+        <ellipse cx="60" cy="178" rx="10" ry="7"/>
+        <ellipse cx="90" cy="182" rx="8" ry="5" fill="#b8b0a0"/>
+      </g>
+      <!-- seeds in furrow -->
+      <g>
+        <circle cx="150" cy="150" r="4.5" fill="#5a3a18"/>
+        <circle cx="172" cy="146" r="4" fill="#4a2e14"/>
+        <circle cx="192" cy="150" r="4.5" fill="#6a4a22"/>
+        <circle cx="160" cy="156" r="3.2" fill="#5a3a18"/>
+      </g>
+      <!-- wheat -->
+      <g class="s-sway">
+        <path d="M236 176 L236 118" stroke="#c4a83a" stroke-width="2.4"/>
+        <path d="M258 178 L260 114" stroke="#c4a83a" stroke-width="2.4"/>
+        <path d="M280 176 L282 116" stroke="#c4a83a" stroke-width="2.4"/>
+        <g fill="#e8c84a">
+          <ellipse cx="236" cy="108" rx="3.2" ry="5"/><ellipse cx="232" cy="100" rx="3" ry="5"/><ellipse cx="240" cy="100" rx="3" ry="5"/><ellipse cx="236" cy="92" rx="3.2" ry="6"/>
+          <ellipse cx="260" cy="104" rx="3.2" ry="5"/><ellipse cx="256" cy="96" rx="3" ry="5"/><ellipse cx="264" cy="96" rx="3" ry="5"/><ellipse cx="260" cy="88" rx="3.2" ry="6"/>
+          <ellipse cx="282" cy="106" rx="3.2" ry="5"/><ellipse cx="278" cy="98" rx="3" ry="5"/><ellipse cx="286" cy="98" rx="3" ry="5"/><ellipse cx="282" cy="90" rx="3.2" ry="6"/>
+        </g>
+      </g>
+      <g class="s-sway2">
+        <path d="M304 178 L306 116" stroke="#c4a83a" stroke-width="2.4"/>
+        <g fill="#f0d45a">
+          <ellipse cx="306" cy="106" rx="3.2" ry="5"/><ellipse cx="302" cy="98" rx="3" ry="5"/><ellipse cx="310" cy="98" rx="3" ry="5"/><ellipse cx="306" cy="90" rx="3.2" ry="6"/>
+        </g>
+      </g>
+    `);
+  },
+  make() {
+    return svg(`
+      <rect width="360" height="200" fill="#efe0c8"/>
+      <rect x="0" y="154" width="360" height="46" fill="#d4b48a"/>
+      <rect x="16" y="144" width="328" height="14" rx="2" fill="#b88850"/>
+      <rect x="16" y="144" width="328" height="4" fill="#c99a64"/>
+      <!-- log with rings -->
+      <g>
+        <rect x="40" y="92" width="78" height="52" rx="8" fill="#a06a34"/>
+        <ellipse cx="118" cy="118" rx="16" ry="26" fill="#c48a4a"/>
+        <ellipse cx="118" cy="118" rx="12" ry="20" fill="none" stroke="#8a5a2a" stroke-width="1.5"/>
+        <ellipse cx="118" cy="118" rx="7" ry="12" fill="none" stroke="#8a5a2a" stroke-width="1.2"/>
+        <ellipse cx="118" cy="118" rx="3" ry="5" fill="#8a5a2a"/>
+        <ellipse cx="40" cy="118" rx="10" ry="26" fill="#8a5a2a"/>
+      </g>
+      <!-- planks -->
+      <g>
+        <rect x="148" y="96" width="118" height="16" rx="2" fill="#d2a060"/>
+        <rect x="156" y="114" width="118" height="16" rx="2" fill="#c49050"/>
+        <rect x="148" y="132" width="118" height="16" rx="2" fill="#d2a060"/>
+        <path d="M156 100 h100 M164 118 h96 M156 136 h100" stroke="#b88840" stroke-width="1" opacity=".55"/>
+      </g>
+      <!-- coiled rope -->
+      <g fill="none" stroke="#7a4a22" stroke-linecap="round">
+        <ellipse cx="308" cy="118" rx="28" ry="16" stroke-width="7"/>
+        <ellipse cx="308" cy="118" rx="18" ry="10" stroke-width="7"/>
+        <ellipse cx="308" cy="118" rx="8" ry="4" stroke-width="6"/>
+        <path d="M336 118 q14 18 4 28" stroke-width="6"/>
+      </g>
+    `);
+  },
+  moon() {
+    return svg(`
+      <defs>
+        <radialGradient id="mn" cx="50%" cy="50%" r="50%">
+          <stop offset="0" stop-color="#fff6d0"/><stop offset="1" stop-color="#e8d48a"/>
+        </radialGradient>
+        <radialGradient id="mn-g" cx="50%" cy="50%" r="50%">
+          <stop offset="0" stop-color="#fff6d0" stop-opacity=".85"/><stop offset="1" stop-color="#fff6d0" stop-opacity="0"/>
+        </radialGradient>
+        <radialGradient id="torch-g" cx="50%" cy="50%" r="50%">
+          <stop offset="0" stop-color="#ffb43a" stop-opacity=".7"/><stop offset="1" stop-color="#ffb43a" stop-opacity="0"/>
+        </radialGradient>
+      </defs>
+      <rect width="360" height="200" fill="#161a36"/>
+      <circle class="s-pulse" cx="250" cy="46" r="48" fill="url(#mn-g)"/>
+      <circle cx="250" cy="46" r="22" fill="url(#mn)"/>
+      <circle cx="258" cy="40" r="4.5" fill="#e0d09a" opacity=".45"/>
+      <circle cx="242" cy="52" r="3" fill="#e0d09a" opacity=".35"/>
+      <g fill="#fff6d0">
+        <circle class="s-twinkle" cx="36" cy="26" r="1.7"/>
+        <circle class="s-twinkle2" cx="78" cy="48" r="1.3"/>
+        <circle class="s-twinkle" cx="132" cy="20" r="2"/>
+        <circle class="s-twinkle2" cx="168" cy="58" r="1.3"/>
+        <circle class="s-twinkle" cx="310" cy="28" r="1.6"/>
+        <circle class="s-twinkle2" cx="332" cy="70" r="1.2"/>
+        <circle class="s-twinkle" cx="96" cy="80" r="1.2"/>
+        <circle class="s-twinkle2" cx="200" cy="24" r="1.4"/>
+      </g>
+      <path d="M0 168 L70 140 L110 156 L180 128 L240 150 L300 132 L360 158 V200 H0 Z" fill="#1c2040"/>
+      <g>
+        <rect x="78" y="148" width="36" height="26" fill="#2a2458"/>
+        <path d="M72 148 L96 128 L120 148 Z" fill="#3a3068"/>
+        <rect x="92" y="156" width="10" height="10" fill="#f0d78c"/>
+      </g>
+      <g>
+        <circle cx="58" cy="128" r="16" fill="url(#torch-g)" class="s-flicker"/>
+        <path class="s-flicker" d="M52 136 l6 -22 6 22 z" fill="#ffb43a"/>
+        <path class="s-flicker" d="M55 136 l4 -14 4 14 z" fill="#ffe08a"/>
+        <rect x="55" y="136" width="6" height="28" rx="1.5" fill="#8a5a2a"/>
+      </g>
+    `);
+  },
+  bed() {
+    return svg(`
+      <rect width="360" height="200" fill="#241c44"/>
+      <rect x="214" y="24" width="96" height="76" rx="8" fill="#3a2f66"/>
+      <rect x="222" y="32" width="80" height="60" rx="4" fill="#1a1436"/>
+      <circle class="s-pulse" cx="274" cy="52" r="12" fill="#efe0a0" opacity=".9"/>
+      <g fill="#efe0a0">
+        <circle class="s-twinkle" cx="246" cy="42" r="1.3"/>
+        <circle class="s-twinkle2" cx="290" cy="70" r="1.1"/>
+        <circle class="s-twinkle" cx="258" cy="78" r="1"/>
+      </g>
+      <rect x="214" y="60" width="96" height="6" fill="#4a3a72"/>
+      <!-- bed -->
+      <rect x="30" y="104" width="16" height="72" rx="4" fill="#4a3068"/>
+      <rect x="206" y="104" width="16" height="72" rx="4" fill="#4a3068"/>
+      <rect x="40" y="124" width="172" height="52" rx="10" fill="#6a4a8a"/>
+      <path d="M48 128 Q120 118 200 128 L200 158 Q120 168 48 158 Z" fill="#f0e6f6"/>
+      <ellipse cx="78" cy="122" rx="24" ry="14" fill="#e8d8f0"/>
+      <rect x="40" y="154" width="172" height="14" fill="#5a3a7a"/>
+      <!-- lamp glow -->
+      <circle cx="68" cy="86" r="18" fill="#f0c06a" opacity=".2" class="s-pulse"/>
+      <circle cx="68" cy="90" r="8" fill="#f0c06a" class="s-pulse"/>
+      <path d="M64 98 h8 l2 10 h-12 z" fill="#d8b060"/>
+      <rect x="58" y="108" width="20" height="6" rx="1" fill="#5a3a7a"/>
+    `);
+  },
+  finale() {
+    return svg(`
+      <defs>
+        <radialGradient id="fi" cx="50%" cy="50%" r="50%">
+          <stop offset="0" stop-color="#fff4c0"/><stop offset="1" stop-color="#f0a12e"/>
+        </radialGradient>
+      </defs>
+      <rect width="360" height="200" fill="#ffd76a"/>
+      <g class="s-rays" opacity=".55" transform="translate(180,88)" stroke="#fff2b0" stroke-width="4" stroke-linecap="round">
+        <line x1="0" y1="-44" x2="0" y2="-68"/><line x1="32" y1="-32" x2="48" y2="-50"/>
+        <line x1="44" y1="0" x2="68" y2="0"/><line x1="32" y1="32" x2="48" y2="50"/>
+        <line x1="0" y1="44" x2="0" y2="68"/><line x1="-32" y1="32" x2="-48" y2="50"/>
+        <line x1="-44" y1="0" x2="-68" y2="0"/><line x1="-32" y1="-32" x2="-48" y2="-50"/>
+      </g>
+      <polygon class="s-pulse" points="180,34 195,78 242,78 204,106 218,152 180,126 142,152 156,106 118,78 165,78" fill="url(#fi)"/>
+      <g class="s-hop" fill="#ff8a4a">
+        <circle cx="52" cy="44" r="5"/><circle cx="308" cy="58" r="4.5"/><rect x="40" y="110" width="7" height="7" rx="1" transform="rotate(20 43 113)"/>
+      </g>
+      <g class="s-bob2" fill="#e07090">
+        <circle cx="324" cy="120" r="5"/><circle cx="80" cy="158" r="4"/>
+        <rect x="300" y="154" width="8" height="8" rx="1" transform="rotate(-16 304 158)"/>
+      </g>
+      <g class="s-bob" fill="#6db36d">
+        <circle cx="36" cy="70" r="3.5"/><circle cx="330" cy="36" r="3.5"/>
+      </g>
+    `);
+  }
+};
+
+const ICONS = {
+  morning: { bg:"#ffd19a", d:'<rect x="8" y="10" width="24" height="22" rx="3" fill="#9fd4f5" stroke="#c99562" stroke-width="2"/><circle cx="26" cy="18" r="5" fill="#ffe082"/>' },
+  door: { bg:"#b8e0f6", d:'<path d="M8 20 L20 8 L32 20 V32 H8 Z" fill="#c45c3e"/><rect x="12" y="20" width="16" height="12" fill="#f3e0c0"/><rect x="17" y="24" width="6" height="8" fill="#e0a03a"/>' },
+  walk: { bg:"#c8ebc0", d:'<rect x="18" y="20" width="4" height="14" fill="#8a5a2a"/><circle cx="20" cy="16" r="8" fill="#3d9a4a"/>' },
+  sky: { bg:"#8ec5f0", d:'<circle cx="14" cy="16" r="7" fill="#ffe082"/><ellipse cx="26" cy="20" rx="10" ry="6" fill="#fff"/>' },
+  pets: { bg:"#f3e0c8", d:'<ellipse cx="16" cy="24" rx="9" ry="6" fill="#c48a4a"/><circle cx="24" cy="20" r="6" fill="#c48a4a"/><circle cx="30" cy="22" r="5" fill="#efe6d6"/>' },
+  farm: { bg:"#dce8a8", d:'<circle cx="16" cy="22" r="8" fill="#f2f0ea"/><circle cx="24" cy="18" r="6" fill="#4a4a4a"/><path d="M28 14 l10 8 v10 h-20 z" fill="#c45c3e"/>' },
+  water: { bg:"#7ec8c8", d:'<path d="M4 24 Q12 18 20 24 T36 24 V34 H4 Z" fill="#2e8aaa"/><circle cx="26" cy="20" r="4" fill="#f0d060"/>' },
+  yard: { bg:"#d4e4c4", d:'<rect x="6" y="16" width="28" height="10" rx="3" fill="#d94a3a"/><circle cx="14" cy="28" r="4" fill="#2a2a2a"/><circle cx="26" cy="28" r="4" fill="#2a2a2a"/>' },
+  garden: { bg:"#c9d96a", d:'<path d="M20 32 C20 18 14 12 20 6 C26 12 20 18 20 32" fill="#e8d56a"/><ellipse cx="20" cy="32" rx="10" ry="4" fill="#8a5a2a"/>' },
+  make: { bg:"#e6d3b0", d:'<rect x="6" y="14" width="28" height="6" rx="1" fill="#d2a060"/><rect x="8" y="22" width="28" height="6" rx="1" fill="#c49050"/>' },
+  moon: { bg:"#2a2d6e", d:'<circle cx="22" cy="18" r="10" fill="#f0d78c"/><circle cx="26" cy="14" r="6" fill="#2a2d6e"/>' },
+  bed: { bg:"#3a2a58", d:'<rect x="6" y="20" width="28" height="12" rx="3" fill="#f0e6f6"/><rect x="6" y="16" width="8" height="8" rx="3" fill="#e8d8f0"/>' },
+  finale: { bg:"#f6d56a", d:'<polygon points="20,6 23,16 34,16 25,22 28,32 20,26 12,32 15,22 6,16 17,16" fill="#f0a12e"/>' }
+};
+
+
+const state = {
+  view: "map",
+  sceneIndex: 0,
+  queue: [],
+  qIndex: 0,
+  stars: 0,
+  streak: 0,
+  bestStreak: 0,
+  answeredInRun: 0,
+  completed: {},
+  sceneStarCount: {},
+  locked: false,
+  wrongPicked: [],
+  voice: null,
+  shot: false
+};
+
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function sceneById(id) { return SCENES.find(s => s.id === id); }
+
+function pickVoice() {
+  const voices = window.speechSynthesis ? speechSynthesis.getVoices() : [];
+  if (!voices.length) return null;
+  const en = voices.filter(v => /^en(-|_)/i.test(v.lang));
+  const nameRe = /samantha|victoria|karen|moira|tessa|fiona|veena|kate|serena|zira|susan|linda|salli|ivy|joanna|kendra|kimberly|salli|amy|emma|allison|ava|alison|female|woman/i;
+  const maleRe = /male|david|daniel|tom|fred|arthur|aaron|brian|guy|ravi|aaron|nathan|john|alex\b/i;
+  const named = en.find(v => nameRe.test(v.name) && !maleRe.test(v.name));
+  if (named) return named;
+  const sam = voices.find(v => /samantha/i.test(v.name));
+  if (sam) return sam;
+  const femaleEn = en.find(v => nameRe.test(v.name));
+  if (femaleEn) return femaleEn;
+  const notMale = en.find(v => !maleRe.test(v.name));
+  return notMale || en[0] || null;
+}
+
+function refreshVoice() { state.voice = pickVoice(); }
+if (window.speechSynthesis) {
+  refreshVoice();
+  speechSynthesis.addEventListener("voiceschanged", refreshVoice);
+}
+
+function speak(text) {
+  if (state.shot || !window.speechSynthesis) return;
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = "en-US";
+  u.rate = 0.8;
+  u.pitch = 1.05;
+  if (state.voice) u.voice = state.voice;
+  const btn = document.getElementById("btn-listen");
+  btn.classList.add("speaking");
+  u.onend = u.onerror = () => btn.classList.remove("speaking");
+  speechSynthesis.speak(u);
+}
+
+function stopSpeak() {
+  if (window.speechSynthesis) speechSynthesis.cancel();
+  const btn = document.getElementById("btn-listen");
+  if (btn) btn.classList.remove("speaking");
+}
+
+function setTheme(theme) {
+  document.body.className = theme ? ("theme-" + theme) : "";
+  const colors = {
+    morning: "#f3c98a", door: "#9fd4f5", walk: "#8ecdf0", sky: "#6eb6ea",
+    pets: "#f0d2a8", farm: "#b7d36a", water: "#7ec9de", yard: "#c5dca8",
+    garden: "#c8d85a", make: "#e8d2ae", moon: "#12162f", bed: "#1a1436",
+    finale: "#ffd76a"
+  };
+  const c = colors[theme] || "#f3c98a";
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) meta.setAttribute("content", c);
+}
+
+function allTranslations() {
+  return SCENES.flatMap(s => s.items.map(i => i.translation));
+}
+
+function pickChoices(item, scene, count) {
+  const pool = [];
+  const seen = new Set([item.translation]);
+  const add = (t) => { if (t && !seen.has(t)) { seen.add(t); pool.push(t); } };
+  scene.items.forEach(i => add(i.translation));
+  const idx = SCENES.indexOf(scene);
+  [idx - 1, idx + 1, idx - 2, idx + 2].forEach(i => {
+    if (SCENES[i]) SCENES[i].items.forEach(it => add(it.translation));
+  });
+  allTranslations().forEach(add);
+  const distractors = shuffle(pool).slice(0, count - 1);
+  return shuffle([item.translation, ...distractors]);
+}
+
+function renderMap() {
+  const journey = document.getElementById("journey");
+  journey.innerHTML = "";
+  CHAPTERS.forEach(ch => {
+    const h = document.createElement("div");
+    h.className = "chapter";
+    h.textContent = ch.title;
+    journey.appendChild(h);
+    const path = document.createElement("div");
+    path.className = "path";
+    ch.ids.forEach(id => {
+      const scene = sceneById(id);
+      const done = !!state.completed[id];
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "node" + (done ? " done" : "");
+      const icon = ICONS[id];
+      btn.innerHTML = `
+        <div class="node-icon" style="background:${icon.bg}">
+          <svg viewBox="0 0 40 40">${icon.d}</svg>
+        </div>
+        <div class="node-text">
+          <div class="node-name">${scene.name}</div>
+          <div class="node-en">${scene.nameEn}</div>
+        </div>
+        <div class="node-badge">${done ? "⭐" : scene.items.length}</div>`;
+      btn.addEventListener("click", () => startScene(SCENES.indexOf(scene)));
+      path.appendChild(btn);
+    });
+    journey.appendChild(path);
+  });
+  const firstOpen = SCENES.findIndex(s => !state.completed[s.id]);
+  const start = document.getElementById("btn-start");
+  start.textContent = firstOpen === -1 ? "再玩一天" : (state.stars ? "接着走" : "开始今天的冒险");
+}
+
+function showMap() {
+  stopSpeak();
+  state.view = "map";
+  document.getElementById("view-map").style.display = "block";
+  document.getElementById("view-play").style.display = "none";
+  document.getElementById("overlay-clear").classList.remove("show");
+  document.getElementById("overlay-done").classList.remove("show");
+  setTheme("");
+  document.getElementById("hero-art").innerHTML = ART.morning();
+  renderMap();
+  updateStats();
+}
+
+function startScene(index, opts) {
+  const scene = SCENES[index];
+  if (!scene) return;
+  stopSpeak();
+  state.view = "play";
+  state.sceneIndex = index;
+  state.queue = shuffle(scene.items);
+  state.qIndex = 0;
+  state.locked = false;
+  state.wrongPicked = [];
+  document.getElementById("view-map").style.display = "none";
+  document.getElementById("view-play").style.display = "flex";
+  document.getElementById("overlay-clear").classList.remove("show");
+  document.getElementById("overlay-done").classList.remove("show");
+  document.getElementById("play-cn").textContent = scene.name;
+  document.getElementById("play-en").textContent = scene.nameEn;
+  document.getElementById("stage-art").innerHTML = ART[scene.id]();
+  setTheme(scene.theme);
+  renderDots();
+  renderQuestion(opts && opts.silent);
+}
+
+function renderDots() {
+  const el = document.getElementById("dots");
+  el.innerHTML = state.queue.map((_, i) => {
+    const cls = i < state.qIndex ? "dot done" : (i === state.qIndex ? "dot on" : "dot");
+    return `<span class="${cls}"></span>`;
+  }).join("");
+}
+
+function useThreeChoices() {
+  const cleared = Object.keys(state.completed).length;
+  return cleared >= 3 || state.answeredInRun >= 8;
+}
+
+function currentItem() { return state.queue[state.qIndex]; }
+
+function renderQuestion(silent) {
+  const scene = SCENES[state.sceneIndex];
+  const item = currentItem();
+  state.locked = false;
+  state.wrongPicked = [];
+  renderDots();
+  const phrase = document.getElementById("phrase");
+  phrase.textContent = "•••";
+  phrase.className = "phrase hidden-phrase";
+  document.getElementById("feedback").textContent = "";
+  document.getElementById("feedback").className = "feedback";
+  const count = useThreeChoices() ? 3 : 2;
+  const choices = pickChoices(item, scene, count);
+  const box = document.getElementById("choices");
+  box.innerHTML = "";
+  choices.forEach(text => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "choice";
+    b.textContent = text;
+    b.addEventListener("click", () => onChoose(text, b));
+    box.appendChild(b);
+  });
+  if (!silent) {
+    setTimeout(() => speak(item.phrase), 350);
+  }
+}
+
+function onChoose(text, btn) {
+  if (state.locked) return;
+  const item = currentItem();
+  if (text === item.translation) {
+    state.locked = true;
+    btn.classList.add("correct");
+    document.querySelectorAll(".choice").forEach(b => b.disabled = true);
+    const phrase = document.getElementById("phrase");
+    phrase.textContent = item.phrase;
+    phrase.className = "phrase";
+    const fb = document.getElementById("feedback");
+    fb.className = "feedback ok";
+    const firstTry = state.wrongPicked.length === 0;
+    if (firstTry) {
+      state.stars += 1;
+      state.streak += 1;
+      if (state.streak > state.bestStreak) state.bestStreak = state.streak;
+      fb.textContent = state.streak >= 3 ? "答对啦！连击 " + state.streak + " 🔥" : "答对啦！";
+    } else {
+      fb.textContent = "答对啦，再听一遍就记住了。";
+    }
+    state.answeredInRun += 1;
+    updateStats();
+    const wait = state.shot ? 0 : 1600;
+    setTimeout(advanceAfterCorrect, wait);
+  } else {
+    if (state.wrongPicked.indexOf(text) !== -1) return;
+    state.wrongPicked.push(text);
+    state.streak = 0;
+    btn.classList.add("wrong");
+    btn.disabled = true;
+    updateStats();
+    const fb = document.getElementById("feedback");
+    fb.className = "feedback bad";
+    fb.textContent = "再听一次，再选一选。";
+    speak(item.phrase);
+  }
+}
+
+function advanceAfterCorrect() {
+  if (state.qIndex < state.queue.length - 1) {
+    state.qIndex += 1;
+    renderQuestion();
+  } else {
+    finishScene();
+  }
+}
+
+function finishScene() {
+  const scene = SCENES[state.sceneIndex];
+  state.completed[scene.id] = true;
+  state.sceneStarCount[scene.id] = scene.items.length;
+  const allDone = SCENES.every(s => state.completed[s.id]);
+  if (allDone) {
+    const msg = document.getElementById("done-msg");
+    msg.textContent = "一共得到 " + state.stars + " 颗星星，最长连击 " + state.bestStreak + "。明天还可以再走一遍，题目顺序会换新的。";
+    document.getElementById("overlay-done").classList.add("show");
+  } else {
+    document.getElementById("clear-title").textContent = scene.name + "，完成了";
+    document.getElementById("clear-msg").textContent = "这一站的句子都听完了。可以去下一站，也可以回到地图选别的地方。";
+    const nextBtn = document.getElementById("btn-next");
+    const nextIdx = nextUncompleted(state.sceneIndex + 1);
+    nextBtn.style.display = nextIdx === -1 ? "none" : "block";
+    document.getElementById("overlay-clear").classList.add("show");
+  }
+}
+
+function nextUncompleted(from) {
+  for (let i = from; i < SCENES.length; i++) if (!state.completed[SCENES[i].id]) return i;
+  for (let i = 0; i < from; i++) if (!state.completed[SCENES[i].id]) return i;
+  return -1;
+}
+
+function updateStats() {
+  document.getElementById("stat-stars").textContent = "⭐ " + state.stars;
+  document.getElementById("stat-streak").textContent = "🔥 " + state.streak;
+}
+
+function resetRun() {
+  state.stars = 0;
+  state.streak = 0;
+  state.bestStreak = 0;
+  state.answeredInRun = 0;
+  state.completed = {};
+  state.sceneStarCount = {};
+  updateStats();
+}
+
+document.getElementById("btn-start").addEventListener("click", () => {
+  const allDone = SCENES.every(s => state.completed[s.id]);
+  if (allDone) resetRun();
+  const idx = nextUncompleted(0);
+  startScene(idx === -1 ? 0 : idx);
+});
+document.getElementById("btn-back").addEventListener("click", showMap);
+document.getElementById("btn-listen").addEventListener("click", () => {
+  const item = currentItem();
+  if (item) speak(item.phrase);
+});
+document.getElementById("btn-next").addEventListener("click", () => {
+  const idx = nextUncompleted(state.sceneIndex + 1);
+  if (idx !== -1) startScene(idx);
+  else showMap();
+});
+document.getElementById("btn-to-map").addEventListener("click", showMap);
+document.getElementById("btn-again").addEventListener("click", () => {
+  resetRun();
+  startScene(0);
+});
+document.getElementById("btn-done-map").addEventListener("click", () => {
+  showMap();
+});
+
+(function boot() {
+  const params = new URLSearchParams(location.search);
+  const shot = params.get("shot");
+  if (shot) state.shot = true;
+  showMap();
+  if (shot === "map" || !shot) return;
+  const idx = SCENES.findIndex(s => s.id === shot);
+  if (idx !== -1) {
+    if (["farm", "water", "moon", "bed", "finale"].indexOf(shot) !== -1) {
+      state.answeredInRun = 8;
+    }
+    startScene(idx, { silent: true });
+  }
+})();
+</script>
+</body>
+</html>
